@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../lib/store";
+
 import {
   Card,
   CardContent,
@@ -9,9 +10,9 @@ import {
   CardDescription,
 } from "../components/UI/Card";
 import { Button } from "../components/UI/Button";
-import Progress from "../components/ui/progress";
-import { Badge } from "../components/ui/badge";
-import { Separator } from "../components/ui/separator";
+import Progress from "../components/UI/Progress";
+import { Badge } from "../components/UI/Badge";
+
 import {
   CreditCard,
   Upload,
@@ -70,7 +71,7 @@ export default function Dashboard() {
   }, [transactions]);
 
   return (
-    <div className="space-y-6">
+    <div id="dashboard" className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold">
@@ -84,7 +85,7 @@ export default function Dashboard() {
           <Button onClick={() => alert("TODO: Connect Plaid")}>
             <CreditCard size={16} /> Connect
           </Button>
-          <Button variant="secondary" onClick={() => nav("/upload")}>
+          <Button variant="secondary" onClick={() => nav("/transactions")}>
             <Upload size={16} /> Upload
           </Button>
         </div>
@@ -111,6 +112,7 @@ export default function Dashboard() {
           value={ecoPoints}
           icon={<Sparkles size={18} />}
         />
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Leaderboard</CardTitle>
@@ -131,29 +133,42 @@ export default function Dashboard() {
               Your latest purchases and eco tags
             </CardDescription>
           </CardHeader>
+
           <CardContent className="divide-y divide-white/10 p-0">
             {transactions.map((t) => (
               <div key={t.id} className="p-4 flex items-center justify-between">
                 <div className="min-w-0">
                   <p className="truncate">{t.merchant}</p>
                   <p className="text-xs text-[var(--muted)]">{t.date}</p>
+
+                  {/* small line showing we have a receipt attached */}
+                  {t.receipt?.text && (
+                    <p className="text-xs text-[var(--accent)] mt-1">
+                      Receipt ✓
+                    </p>
+                  )}
                 </div>
+
                 <div className="flex items-center gap-3">
-                  <Badge
-                    variant={
-                      t.eco === true
-                        ? "eco"
-                        : t.eco === false
-                        ? "danger"
-                        : "default"
-                    }
-                  >
-                    {t.eco === true
-                      ? "Eco +"
-                      : t.eco === false
-                      ? "Not eco"
-                      : "Needs receipt"}
-                  </Badge>
+                  {t.eco === null ? (
+                    t.receipt?.text ? (
+                      <Badge variant="default">Pending review</Badge>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => nav(`/transactions?uploadFor=${t.id}`)}
+                      >
+                        <Upload size={14} className="mr-1" />
+                        Upload receipt
+                      </Button>
+                    )
+                  ) : t.eco === true ? (
+                    <Badge variant="eco">Eco +</Badge>
+                  ) : (
+                    <Badge variant="danger">Not eco</Badge>
+                  )}
+
                   <span className="tabular-nums">
                     {t.amount < 0 ? "-" : ""}${Math.abs(t.amount).toFixed(2)}
                   </span>

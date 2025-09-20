@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "silicon-vista-424917-p3",
+  "private_key_id": "c646ca232df49efde425603b08d9bb216c84c6cd",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCXyvh72hIQVO8J\nOhwbUva8F0VuwViu0tz8myG52ib8FuAvkBgTr0N8DNT2PPVflZ5VMSX0Got2fUqg\n88gBrzLm+cViYXRdoZNAxSBFRZLaBaLXt7rVCH6vI++zvgsxfPWpOdluxXK3grlC\nlnMh2vtd3PD4b68cC1ZTmi46Q7Ld9U6fYZT/xEQC+Ln6X/HD738e8lK7uxp3+UZ9\nC91ThT5IxJxR+vTnZhkPib1kaXe9lzW5EvT3PHsm5AcSXO5YYUJR2xMGfO/TXFt1\nWJX8YfVWNZza9crNpj+hogTdCFHIXdUJYrlCsIMl/8wOU+xA16ZzveSv4k9heyJt\n3S/O2/JRAgMBAAECggEAKJgE3OZkV07HgFG0i5Aj4QheLrDxXQuSQtHf8pqHO3qI\nqN+huL3xz76Ew3do7Y+PQNw8eKwSqPT33NRlJCIs/D1GzrkeTB32SeeN6kihbcH9\nGzCM/ATiEEeNhqWny6vN7NxGLEwMkkwY7Fhc4Ox1tdPs85u2mkrj4sbEXxuUvau/\n0SekYISea4nOUOyc9DrCS+uJ698OEj60O/phG9es8oGHho2aJF7IcYMjcRs+oTzC\nIYh3jXa8f9HWdASNsdevQ1au98qwhFyqMnTIh+Q1UpWfVWMWMNcZfOuzgGUxwRYf\nU6jHNS3TA3t4HEDST9QkfLqC2dhdFZIddExJy7z+kwKBgQDH39DnxGWzt+9TxTnK\nlKjqPYeyYIpPRH8EscoyTLvBTQQyqZYgIf/XuT1nnpV8fRK//O0tUsOgO6zXK9oU\nCkK/QTjCqowFVy9KRtyXIUvDoA3WRSlp9L8DrMe7Si5Mmh7gnGfuXxIRPTguQNX3\ny74RMn/xZ7krbbhhD4Bq+gSIIwKBgQDCasSaJ063b6T9Q6Hi1+dzCOZwt/TfIm9j\n3kAj8zmRDM4TnCbcQ70yD85mHSKpuBSGeD2hhUh4yNd3j9Jd/5qdOYwooyNPnpB0\ns2ze6LBpzahwF8hHsi9C2bQuJ+o5UlNeWtn9BsL3ME7MO74VZmvOMVQKmmnvibNN\nJXWbFBco+wKBgQCiySbbnJk4RhYlo/vtgiYQoQxjuzzqUl8g86w6S0SfqppAqN4c\nTZSRnczlF8OoIDWlJ9oDj+TEG9YpaQ20RKcYHYadBUoFD3z0gcInVHbgXProCGwy\nX6My2wXRBBmxSdTcGoaLHeMZJ0MaaLPbnZSvbPHHKzMkq7f/VSDB/96xAQKBgEGz\n22VNS2jqrhN5O8hxtqJFq7sEMBkIhiR2A68ij53ZefteljNyIQo+FT6lMgWxVB5t\nnEZtyKQpG8goLqvdqd7gh+Fj4JcTuzX1PSHH+XaILhhTsTepnBc3g5DlpF5i2BHX\nGjxMgK8RAFA9EGwjBOPV/9Tlgk+VdaboteoGzBzpAoGBAJ4AicfDqKtnGruffH3P\nDiQOQ6T27Pqds+YtaIMaEcsZeH8DkQdxI4qmIPZWHyXcNwn0xfnK4dXr2/Mgli/+\no6WYXhDMpI70q1HBkimxPKQrpyHWyOvrBvwusAuAdNbJvcPpwhpAPb0oSW+7HsrZ\nsGN2ZQUH7ZYogRTDp3uI2//z\n-----END PRIVATE KEY-----\n",
+  "client_email": "greenbucks-ocr@silicon-vista-424917-p3.iam.gserviceaccount.com",
+  "client_id": "107459386811172806942",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/greenbucks-ocr%40silicon-vista-424917-p3.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
