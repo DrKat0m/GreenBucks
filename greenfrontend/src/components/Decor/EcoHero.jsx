@@ -7,14 +7,8 @@ export default function EcoHero({ onOpenDashboard }) {
   const NAVBAR_H = 72; // match your sticky header height
   const navigate = useNavigate();
 
-  const scrollToId = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   const handleOpenDashboard = () => {
-    if (typeof onOpenDashboard === "function") onOpenDashboard();
-    else scrollToId("dashboard");
+    navigate("/dashboard");
   };
 
   const handleLearnMore = () => {

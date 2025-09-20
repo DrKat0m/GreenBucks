@@ -295,9 +295,23 @@ function TransactionRow({ transaction, isSelected, isExpanded, onClick }) {
           <div className="font-semibold text-green-400">
             +${(transaction.cashback || 0).toFixed(2)}
           </div>
-          {transaction.needsReceipt && (
-            <div className="text-xs text-amber-400 mt-1">Receipt needed</div>
-          )}
+          <div className="text-xs text-white/60 mt-1">
+            {transaction.cashback > 0 ? (
+              <>
+                {((transaction.cashback / Math.abs(transaction.amount)) * 100).toFixed(1)}% rate
+                <br />
+                <span className="text-white/40">
+                  {transaction.ecoScore >= 7 ? 'Eco bonus' : transaction.ecoScore >= 5 ? 'Base rate' : 'Low eco'}
+                </span>
+              </>
+            ) : (
+              transaction.needsReceipt ? (
+                <span className="text-amber-400">Receipt needed</span>
+              ) : (
+                <span className="text-white/40">No cashback</span>
+              )
+            )}
+          </div>
         </div>
       </div>
 
@@ -447,6 +461,27 @@ function TransactionDetails({ transaction }) {
                 <div className="flex justify-between">
                   <span className="text-white/60">Cashback Rate:</span>
                   <span className="text-white/90">{((transaction.cashback / Math.abs(transaction.amount)) * 100).toFixed(2)}%</span>
+                </div>
+                
+                <div className="mt-2 p-2 bg-white/5 rounded text-xs">
+                  <div className="text-white/70 font-medium mb-1">Cashback calculation:</div>
+                  <div className="text-white/60 space-y-1">
+                    <div>• Amount: ${Math.abs(transaction.amount).toFixed(2)}</div>
+                    <div>• Eco Score: {transaction.ecoScore}/10 ({
+                      transaction.ecoScore >= 9 ? 'Eco++' :
+                      transaction.ecoScore >= 7 ? 'Eco+' :
+                      transaction.ecoScore >= 5 ? 'Neutral' :
+                      transaction.ecoScore >= 3 ? 'Less-eco' :
+                      'Non-eco'
+                    })</div>
+                    <div>• Cashback earned: ${(transaction.cashback || 0).toFixed(2)}</div>
+                    <div className="text-green-400 font-medium">
+                      = {((transaction.cashback / Math.abs(transaction.amount)) * 100).toFixed(2)}% effective rate
+                    </div>
+                    <div className="text-white/50 text-xs mt-1">
+                      Higher eco scores earn better rates
+                    </div>
+                  </div>
                 </div>
               </>
             )}

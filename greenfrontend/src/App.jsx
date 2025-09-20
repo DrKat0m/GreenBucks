@@ -8,6 +8,7 @@ import ErrorBoundary from "./components/Util/ErrorBoundary";
 const AppLayout = lazy(() => import("./components/Layout/AppLayout"));
 const Auth = lazy(() => import("./routes/Auth"));
 const Home = lazy(() => import("./routes/Home"));
+const Dashboard = lazy(() => import("./routes/Dashboard"));
 const Transactions = lazy(() => import("./routes/Transactions"));
 const About = lazy(() => import("./routes/About"));
 
@@ -43,6 +44,7 @@ export default function App() {
             }
           >
             <Route index element={<Home />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="about" element={<About />} />
           </Route>

@@ -39,13 +39,35 @@ export default function Dashboard() {
     if (!transactions.length) return { ecoPct: 0, ecoPoints: 0, walletUSD: "0.00" };
     
     const total = transactions.length;
-    const ecoCount = transactions.filter((t) => t.eco === true).length;
     const totalCashback = transactions.reduce((sum, t) => sum + (t.cashback || 0), 0);
-    const avgEcoScore = transactions.reduce((sum, t) => sum + (t.ecoScore || 0), 0) / total;
+    
+    // Calculate average eco score from transactions with scores
+    const scoredTransactions = transactions.filter(t => t.ecoScore && t.ecoScore > 0);
+    const avgEcoScore = scoredTransactions.length > 0 
+      ? scoredTransactions.reduce((sum, t) => sum + t.ecoScore, 0) / scoredTransactions.length
+      : 0;
+    
+    // Convert average eco score (1-10) to percentage (0-100%)
+    const greenScorePercent = Math.round((avgEcoScore / 10) * 100);
+    
+    // Calculate Eco Points: Sum of all eco scores with bonuses
+    const totalEcoPoints = scoredTransactions.reduce((sum, t) => {
+      let points = t.ecoScore;
+      
+      // Bonus points for high eco scores
+      if (t.ecoScore >= 9) points += 5; // Eco++ bonus
+      else if (t.ecoScore >= 7) points += 2; // Eco+ bonus
+      else if (t.ecoScore >= 5) points += 1; // Neutral bonus
+      
+      // Bonus for high-value eco transactions
+      if (t.ecoScore >= 7 && Math.abs(t.amount) > 50) points += 3;
+      
+      return sum + points;
+    }, 0);
     
     return {
-      ecoPct: Math.round((ecoCount / total) * 100),
-      ecoPoints: Math.round(avgEcoScore * 10), // Convert eco score to points
+      ecoPct: greenScorePercent, // Now based on average eco score
+      ecoPoints: Math.round(totalEcoPoints), // Sum of all eco scores with bonuses
       walletUSD: totalCashback.toFixed(2),
     };
   }, [transactions]);
@@ -113,12 +135,22 @@ export default function Dashboard() {
             title="Eco-Wallet"
             value={`$${walletUSD}`}
             icon={<Leaf size={18} />}
-            desc="Cashback from green purchases"
-          />
+            desc={`Total cashback from ${transactions.length} transactions`}
+          >
+            {transactions.length > 0 && (
+              <div className="mt-2 text-xs text-white/60">
+                <div>Avg rate: {((parseFloat(walletUSD) / transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0)) * 100).toFixed(2)}%</div>
+                <div className="text-green-400">
+                  {transactions.filter(t => (t.cashback || 0) > 0).length} earning transactions
+                </div>
+              </div>
+            )}
+          </Stat>
           <Stat
-            title="Monthly Green Score"
+            title="Green Score"
             value={`${ecoPct}%`}
             icon={<TrendingUp size={18} />}
+            desc={`Average eco rating across ${transactions.filter(t => t.ecoScore && t.ecoScore > 0).length} scored transactions`}
           >
             <div className="mt-2">
               <Progress value={ecoPct} />
@@ -128,36 +160,89 @@ export default function Dashboard() {
             title="Eco Points"
             value={ecoPoints}
             icon={<Sparkles size={18} />}
-          />
+            desc="Accumulated from eco-friendly purchases"
+          >
+            {transactions.length > 0 && (() => {
+              const scoredTxs = transactions.filter(t => t.ecoScore && t.ecoScore > 0);
+              const basePoints = scoredTxs.reduce((sum, t) => sum + t.ecoScore, 0);
+              const bonusPoints = ecoPoints - basePoints;
+              
+              return (
+                <div className="mt-2 text-xs text-white/60">
+                  <div>Base: {basePoints} pts</div>
+                  <div className="text-yellow-400">
+                    Bonuses: +{bonusPoints} pts
+                  </div>
+                </div>
+              );
+            })()}
+          </Stat>
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Recent activity</CardTitle>
-              <CardDescription>Last 3 purchases</CardDescription>
+              <CardDescription>Latest eco-scored purchases</CardDescription>
             </CardHeader>
             <CardContent className="divide-y divide-white/10 p-0">
-              {transactions.slice(0, 3).map((t) => (
-                <div
-                  key={t.id}
-                  className="p-4 flex items-center justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate">{t.merchant}</p>
-                    <p className="text-xs text-[var(--muted)]">{t.date}</p>
+              {transactions.slice(0, 3).map((t) => {
+                const getEcoLabel = (ecoScore) => {
+                  if (!ecoScore) return { label: 'Needs receipt', variant: 'default', color: 'text-amber-400' };
+                  if (ecoScore >= 9) return { label: 'Eco++', variant: 'eco', color: 'text-emerald-400' };
+                  if (ecoScore >= 7) return { label: 'Eco+', variant: 'eco', color: 'text-green-400' };
+                  if (ecoScore >= 5) return { label: 'Neutral', variant: 'default', color: 'text-yellow-400' };
+                  if (ecoScore >= 3) return { label: 'Less-eco', variant: 'danger', color: 'text-orange-400' };
+                  return { label: 'Non-eco', variant: 'danger', color: 'text-red-400' };
+                };
+
+                const ecoInfo = getEcoLabel(t.ecoScore);
+                
+                return (
+                  <div
+                    key={t.id}
+                    className="p-4 flex items-center justify-between hover:bg-white/5 cursor-pointer transition-colors"
+                    onClick={() => nav('/transactions')}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium">{t.merchant}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-xs text-white/60">{new Date(t.date).toLocaleDateString()}</p>
+                        {t.ecoScore && (
+                          <span className="text-xs text-white/50">
+                            Score: {t.ecoScore}/10
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <div className="tabular-nums font-medium">
+                          ${Math.abs(t.amount).toFixed(2)}
+                        </div>
+                        {(t.cashback || 0) > 0 && (
+                          <div className="text-xs text-green-400">
+                            +${t.cashback.toFixed(2)}
+                          </div>
+                        )}
+                      </div>
+                      <Badge variant={ecoInfo.variant} className={`${ecoInfo.color} text-xs`}>
+                        {ecoInfo.label}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {t.eco === null ? (
-                      <Badge variant="default">Unlabeled</Badge>
-                    ) : t.eco ? (
-                      <Badge variant="eco">Eco +</Badge>
-                    ) : (
-                      <Badge variant="danger">Not eco</Badge>
-                    )}
-                    <span className="tabular-nums">
-                      {t.amount < 0 ? "-" : ""}${Math.abs(t.amount).toFixed(2)}
-                    </span>
-                  </div>
+                );
+              })}
+              
+              {transactions.length > 3 && (
+                <div className="p-3 text-center">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => nav('/transactions')}
+                    className="text-xs text-white/60 hover:text-white"
+                  >
+                    View all {transactions.length} transactions →
+                  </Button>
                 </div>
-              ))}
+              )}
             </CardContent>
           </Card>
         </div>

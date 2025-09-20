@@ -1,61 +1,27 @@
 // src/components/Layout/AppLayout.jsx
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, lazy, Suspense } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import useStore from "../../lib/store";
 import { Button } from "../UI/Button";
 import { cn } from "../../lib/cn";
 import logo from "../../assets/greenbucks_logo.svg";
 import FloatingKoshiButton from "../Koshi/FloatingKoshiButton";
-import useScrollSpy from "../../lib/useScrollSpy";
 
 // 🔻 lazy-loaded decor & chat (keep initial bundle lean)
 const PageBackdrop = lazy(() => import("../Decor/PageBackdrop"));
 const KoshiChat = lazy(() => import("../Koshi/KoshiChat"));
 
 // prefetch helpers (matching your route file paths)
+const prefetchDashboard = () => import("../../routes/Dashboard");
 const prefetchTransactions = () => import("../../routes/Transactions");
 const prefetchAbout = () => import("../../routes/About");
-
-// show all sections on home (for scroll-spy)
-const HOME_SECTIONS = ["home", "dashboard", "transactions", "about"];
 
 export default function AppLayout() {
   const user = useStore((s) => s.user);
   const logout = useStore((s) => s.logout);
   const [chatOpen, setChatOpen] = useState(false);
   const navigate = useNavigate();
-  const { pathname, hash } = useLocation();
-
-  const spyIds = pathname === "/" ? HOME_SECTIONS : [];
-  const activeId = useScrollSpy(spyIds);
-
-  useEffect(() => {
-    if (pathname === "/" && activeId) {
-      const newHash = `#${activeId}`;
-      if (hash !== newHash) {
-        try {
-          window.history.replaceState(null, "", newHash);
-        } catch {
-          // some extensions throw on replaceState; ignore
-        }
-      }
-    }
-  }, [pathname, activeId, hash]);
-
-  const doScroll = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const scrollTo = (id) => {
-    if (pathname !== "/") {
-      navigate("/", { replace: false });
-      // tiny delay lets the home chunks mount before scrolling
-      setTimeout(() => doScroll(id), 50);
-    } else {
-      doScroll(id);
-    }
-  };
+  const { pathname } = useLocation();
 
   const linkCls = (active) =>
     cn(
@@ -75,7 +41,7 @@ export default function AppLayout() {
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--bg-2)]/80 backdrop-blur">
         <div className="shell h-16 flex items-center justify-between">
           <button
-            onClick={() => scrollTo("home")}
+            onClick={() => navigate("/")}
             className="flex items-center gap-2 shrink-0"
           >
             <img src={logo} alt="GreenBucks" className="h-16 w-auto" />
@@ -84,15 +50,17 @@ export default function AppLayout() {
 
           <nav className="flex items-center gap-6">
             <button
-              onClick={() => scrollTo("home")}
-              className={linkCls(pathname === "/" && activeId === "home")}
+              onClick={() => navigate("/")}
+              className={linkCls(pathname === "/")}
             >
               Home
             </button>
 
             <button
-              onClick={() => scrollTo("dashboard")}
-              className={linkCls(pathname === "/" && activeId === "dashboard")}
+              onMouseEnter={prefetchDashboard}
+              onFocus={prefetchDashboard}
+              onClick={() => navigate("/dashboard")}
+              className={linkCls(pathname === "/dashboard")}
             >
               Dashboard
             </button>
@@ -100,15 +68,8 @@ export default function AppLayout() {
             <button
               onMouseEnter={prefetchTransactions}
               onFocus={prefetchTransactions}
-              onClick={() =>
-                pathname === "/"
-                  ? scrollTo("transactions")
-                  : navigate("/transactions")
-              }
-              className={linkCls(
-                pathname === "/transactions" ||
-                  (pathname === "/" && activeId === "transactions")
-              )}
+              onClick={() => navigate("/transactions")}
+              className={linkCls(pathname === "/transactions")}
             >
               Transactions
             </button>
@@ -116,13 +77,8 @@ export default function AppLayout() {
             <button
               onMouseEnter={prefetchAbout}
               onFocus={prefetchAbout}
-              onClick={() =>
-                pathname === "/" ? scrollTo("about") : navigate("/about")
-              }
-              className={linkCls(
-                pathname === "/about" ||
-                  (pathname === "/" && activeId === "about")
-              )}
+              onClick={() => navigate("/about")}
+              className={linkCls(pathname === "/about")}
             >
               About
             </button>

@@ -26,9 +26,8 @@ export default function EcoHero() {
     return () => clearInterval(t);
   }, []);
 
-  const scrollToDashboard = () => {
-    const el = document.getElementById("dashboard");
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  const goToDashboard = () => {
+    nav("/dashboard");
   };
 
   return (
@@ -67,7 +66,7 @@ export default function EcoHero() {
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <button
-              onClick={scrollToDashboard}
+              onClick={goToDashboard}
               className="inline-flex items-center rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-black hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             >
               Open dashboard
