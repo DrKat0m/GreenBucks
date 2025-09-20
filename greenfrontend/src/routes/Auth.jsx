@@ -16,21 +16,34 @@ import EcoBackground from "../components/Decor/EcoBackground";
 import logo from "../assets/greenbucks_logo.svg";
 
 export default function Auth() {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const [err, setErr] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
   const user = useStore((s) => s.user);
   const login = useStore((s) => s.login);
+  const registerUser = useStore((s) => s.register);
   const nav = useNavigate();
 
   if (user) return <Navigate to="/" replace />;
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     try {
-      login(data);
+      setErr("");
+      if (isLogin) {
+        await login(data);
+      } else {
+        await registerUser(data);
+      }
       nav("/", { replace: true });
     } catch (e) {
-      setErr(e.message || "Login failed");
+      setErr(e.message || `${isLogin ? 'Login' : 'Registration'} failed`);
     }
+  };
+
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setErr("");
+    reset();
   };
 
   return (
@@ -44,18 +57,31 @@ export default function Auth() {
               GreenBucks
             </span>
           </div>
-          <CardTitle>Sign in</CardTitle>
+          <CardTitle>{isLogin ? 'Sign in' : 'Create Account'}</CardTitle>
           <CardDescription>
-            Welcome back. Use the demo credentials below.
+            {isLogin 
+              ? 'Welcome back. Use the demo credentials below.' 
+              : 'Join GreenBucks and start tracking your eco-friendly purchases.'
+            }
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {!isLogin && (
+              <div>
+                <Label>Full Name</Label>
+                <Input
+                  type="text"
+                  placeholder="Your full name"
+                  {...register("full_name", { required: !isLogin })}
+                />
+              </div>
+            )}
             <div>
               <Label>Email</Label>
               <Input
                 type="email"
-                placeholder="aarya@greenbucks.app"
+                placeholder={isLogin ? "apoorv@example.com" : "your@email.com"}
                 {...register("email", { required: true })}
               />
             </div>
@@ -63,16 +89,35 @@ export default function Auth() {
               <Label>Password</Label>
               <Input
                 type="password"
-                placeholder="test1234"
+                placeholder={isLogin ? "password123" : "Choose a password"}
                 {...register("password", { required: true })}
               />
             </div>
             {err && <p className="text-sm text-[var(--danger)]">{err}</p>}
-            <Button className="w-full">Sign in</Button>
-            <p className="text-xs text-[var(--muted)]">
-              Demo: aarya@greenbucks.app / test1234
-            </p>
-            <p className="text-xs">
+            <Button className="w-full">
+              {isLogin ? 'Sign in' : 'Create Account'}
+            </Button>
+            
+            {isLogin && (
+              <p className="text-xs text-[var(--muted)]">
+                Demo: apoorv@example.com / password123
+              </p>
+            )}
+            
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="text-xs text-[var(--accent)] hover:underline"
+              >
+                {isLogin 
+                  ? "Don't have an account? Sign up" 
+                  : "Already have an account? Sign in"
+                }
+              </button>
+            </div>
+            
+            <p className="text-xs text-center">
               <Link to="/" className="text-[var(--accent)]">
                 Back to site
               </Link>

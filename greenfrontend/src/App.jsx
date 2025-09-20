@@ -1,7 +1,8 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import useStore from "./lib/store";
+import ErrorBoundary from "./components/Util/ErrorBoundary";
 
 // 🔻 lazy pages & layout
 const AppLayout = lazy(() => import("./components/Layout/AppLayout"));
@@ -22,23 +23,32 @@ function RouteFallback() {
 }
 
 export default function App() {
+  const verifyToken = useStore((s) => s.verifyToken);
+
+  // Verify token on app startup
+  useEffect(() => {
+    verifyToken();
+  }, [verifyToken]);
+
   return (
-    <Suspense fallback={<RouteFallback />}>
-      <Routes>
-        <Route path="/auth" element={<Auth />} />
-        <Route
-          element={
-            <PrivateRoute>
-              <AppLayout />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Home />} />
-          <Route path="transactions" element={<Transactions />} />
-          <Route path="about" element={<About />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            element={
+              <PrivateRoute>
+                <AppLayout />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Home />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="about" element={<About />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }

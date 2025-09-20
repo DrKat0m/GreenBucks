@@ -1,5 +1,5 @@
 // src/routes/Dashboard.jsx
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../lib/store";
 
@@ -15,53 +15,51 @@ import Progress from "../components/UI/Progress";
 import { Badge } from "../components/UI/Badge";
 
 import { CreditCard, Upload, Sparkles, TrendingUp, Leaf } from "lucide-react";
+import PlaidLink from "../components/UI/PlaidLink";
+// import ApiTest from "../components/Util/ApiTest";
 
 export default function Dashboard() {
   const tx = useStore((s) => s.transactions);
+  const transactionsLoading = useStore((s) => s.transactionsLoading);
+  const transactionsError = useStore((s) => s.transactionsError);
+  const fetchTransactions = useStore((s) => s.fetchTransactions);
+  const user = useStore((s) => s.user);
   const nav = useNavigate();
 
-  const transactions = tx?.length
-    ? tx
-    : [
-        {
-          id: "t1",
-          merchant: "CATA Bus Pass",
-          amount: -14.0,
-          eco: true,
-          date: "2025-09-15",
-        },
-        {
-          id: "t2",
-          merchant: "Walmart (mixed)",
-          amount: -38.25,
-          eco: null,
-          date: "2025-09-15",
-        },
-        {
-          id: "t3",
-          merchant: "Farmer's Market",
-          amount: -22.9,
-          eco: true,
-          date: "2025-09-14",
-        },
-        {
-          id: "t4",
-          merchant: "Rideshare",
-          amount: -11.8,
-          eco: false,
-          date: "2025-09-13",
-        },
-      ];
+  // Fetch transactions when component mounts
+  useEffect(() => {
+    if (user && tx.length === 0 && !transactionsLoading) {
+      fetchTransactions();
+    }
+  }, [user, fetchTransactions, tx.length, transactionsLoading]);
+
+  const transactions = tx;
 
   const { ecoPct, ecoPoints, walletUSD } = useMemo(() => {
-    const total = transactions.length || 1;
+    if (!transactions.length) return { ecoPct: 0, ecoPoints: 0, walletUSD: "0.00" };
+    
+    const total = transactions.length;
     const ecoCount = transactions.filter((t) => t.eco === true).length;
+    const totalCashback = transactions.reduce((sum, t) => sum + (t.cashback || 0), 0);
+    const avgEcoScore = transactions.reduce((sum, t) => sum + (t.ecoScore || 0), 0) / total;
+    
     return {
       ecoPct: Math.round((ecoCount / total) * 100),
-      ecoPoints: ecoCount * 15 + (total - ecoCount) * 5,
-      walletUSD: Math.max(0, ecoCount * 0.75).toFixed(2),
+      ecoPoints: Math.round(avgEcoScore * 10), // Convert eco score to points
+      walletUSD: totalCashback.toFixed(2),
     };
   }, [transactions]);
+
+  const handlePlaidSuccess = (result, metadata) => {
+    // Refresh transactions to show newly synced data
+    setTimeout(() => {
+      fetchTransactions();
+    }, 2000);
+  };
+
+  const handlePlaidError = (error) => {
+    console.error('Plaid connection error:', error);
+  };
 
   return (
     <>
@@ -71,16 +69,43 @@ export default function Dashboard() {
         className="scroll-mt-24 mx-auto w-full max-w-7xl px-6 pt-10 pb-8 lg:px-8 space-y-6"
       >
         {/* Quick actions */}
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-[var(--muted)]">
-            Small actions, big impact — your latest sustainable wins.
-          </p>
-          <div className="flex gap-2">
-            <Button onClick={() => alert("TODO: Connect Plaid")}>
-              <CreditCard size={16} /> Connect
-            </Button>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm text-[var(--muted)]">
+              Small actions, big impact — your latest sustainable wins.
+            </p>
+          </div>
+          
+          {/* Plaid Connection */}
+          <div className="max-w-md">
+            <h3 className="text-sm font-medium text-white/80 mb-2">Connect Your Bank</h3>
+            <PlaidLink 
+              onSuccess={handlePlaidSuccess}
+              onError={handlePlaidError}
+            />
           </div>
         </div>
+
+        {/* Loading/Error States */}
+        {transactionsLoading && (
+          <div className="text-center py-8">
+            <p className="text-white/60">Loading transactions...</p>
+          </div>
+        )}
+        
+        {transactionsError && (
+          <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-4">
+            <p className="text-red-400">Error loading transactions: {transactionsError}</p>
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className="mt-2"
+              onClick={() => fetchTransactions()}
+            >
+              Retry
+            </Button>
+          </div>
+        )}
 
         {/* KPI Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
