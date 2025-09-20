@@ -1,12 +1,35 @@
-import leaves from "../../assets/greenbkg.jpeg";
+import { useLocation } from "react-router-dom";
+import { cn } from "../../lib/cn";
+import bg from "../../assets/greenbkg.jpeg";
+
+/**
+ * Fixed, full-screen background using the leaves image.
+ * - Default: blurred + dim (so content pops)
+ * - Slightly less blur on the Dashboard so the hero can blend into it
+ */
 export default function EcoBackground() {
+  const { pathname } = useLocation();
+  const onDashboard = pathname === "/";
+
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
-      <div className="absolute inset-0 bg-[var(--bg)]" />
-      <div
-        className="absolute right-[-8%] top-[-6%] h-[68vh] w-[68vw] opacity-[.16] blur-[6px] rounded-[80px] bg-cover bg-center rotate-[-2deg]"
-        style={{ backgroundImage: `url(${leaves})` }}
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+    >
+      {/* Leaves */}
+      <img
+        src={bg}
+        alt=""
+        className={cn(
+          "h-full w-full object-cover scale-105 transition-all duration-500",
+          // Dial the blur down a notch on the dashboard so the hero can melt into it
+          onDashboard ? "blur-[5px] opacity-[0.22]" : "blur-[7px] opacity-[0.18]"
+        )}
       />
+
+      {/* Very subtle vignettes so edges feel natural */}
+      <div className="absolute inset-0 bg-[radial-gradient(1200px_900px_at_50%_-10%,#06110c_0%,transparent_60%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-[28vh] bg-gradient-to-b from-transparent to-[#080e0c]" />
     </div>
   );
 }
