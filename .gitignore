@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vite/
+*.log
+.DS_Store
+Icon?
+._*
+.env*
+!.env.example
+greenbucks/src/index.css
