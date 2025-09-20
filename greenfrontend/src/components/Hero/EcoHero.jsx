@@ -1,7 +1,8 @@
+// src/components/Decor/EcoHero.jsx
 import { useEffect, useMemo, useState } from "react";
 import useStore from "../../lib/store";
 import { ChevronDown, Leaf } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const THOUGHTS = [
   "Small actions, big impact.",
@@ -20,15 +21,25 @@ export default function EcoHero() {
 
   const [idx, setIdx] = useState(0);
   const nav = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const t = setInterval(() => setIdx((i) => (i + 1) % THOUGHTS.length), 4000);
     return () => clearInterval(t);
   }, []);
 
-  const scrollToDashboard = () => {
-    const el = document.getElementById("dashboard");
+  const doScroll = (id) => {
+    const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  const scrollTo = (id) => {
+    if (pathname !== "/") {
+      nav("/", { replace: false });
+      setTimeout(() => doScroll(id), 50);
+    } else {
+      doScroll(id);
+    }
   };
 
   return (
@@ -66,15 +77,19 @@ export default function EcoHero() {
           </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
+            {/* Dashboard button */}
             <button
-              onClick={scrollToDashboard}
+              onClick={() =>
+                pathname === "/" ? scrollTo("dashboard") : nav("/dashboard")
+              }
               className="inline-flex items-center rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-black hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             >
               Open dashboard
             </button>
 
+            {/* About button */}
             <button
-              onClick={() => nav("/about")}
+              onClick={() => scrollTo("about")}
               className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-white/80 ring-1 ring-white/10 hover:bg-white/10"
             >
               Learn more

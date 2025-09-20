@@ -3,10 +3,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import useStore from "./lib/store";
 
-// 🔻 lazy pages & layout
 const AppLayout = lazy(() => import("./components/Layout/AppLayout"));
 const Auth = lazy(() => import("./routes/Auth"));
 const Home = lazy(() => import("./routes/Home"));
+const Dashboard = lazy(() => import("./routes/Dashboard")); // added
 const Transactions = lazy(() => import("./routes/Transactions"));
 const About = lazy(() => import("./routes/About"));
 
@@ -34,6 +34,7 @@ export default function App() {
           }
         >
           <Route index element={<Home />} />
+          <Route path="dashboard" element={<Dashboard />} /> {/* added */}
           <Route path="transactions" element={<Transactions />} />
           <Route path="about" element={<About />} />
         </Route>

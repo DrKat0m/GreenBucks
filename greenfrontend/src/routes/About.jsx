@@ -11,10 +11,7 @@ export default function About() {
   const nav = useNavigate();
 
   return (
-    <div
-      id="about"
-      className="scroll-mt-24 mx-auto max-w-6xl px-6 sm:px-8 py-16 space-y-16"
-    >
+    <div className="mx-auto max-w-6xl px-6 sm:px-8 py-16 space-y-16">
       {/* HERO */}
       <section aria-labelledby="about-title">
         <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-emerald-300 ring-1 ring-emerald-400/20">
@@ -127,6 +124,12 @@ export default function About() {
             className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-black hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
           >
             Home
+          </button>
+          <button
+            onClick={() => nav("/dashboard")}
+            className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+          >
+            Go to dashboard
           </button>
         </div>
       </section>

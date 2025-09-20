@@ -1,6 +1,5 @@
 // src/routes/Dashboard.jsx
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import useStore from "../lib/store";
 
 import {
@@ -13,12 +12,10 @@ import {
 import { Button } from "../components/UI/Button";
 import Progress from "../components/UI/Progress";
 import { Badge } from "../components/UI/Badge";
-
-import { CreditCard, Upload, Sparkles, TrendingUp, Leaf } from "lucide-react";
+import { CreditCard, Sparkles, TrendingUp, Leaf } from "lucide-react";
 
 export default function Dashboard() {
   const tx = useStore((s) => s.transactions);
-  const nav = useNavigate();
 
   const transactions = tx?.length
     ? tx
@@ -64,80 +61,71 @@ export default function Dashboard() {
   }, [transactions]);
 
   return (
-    <>
-      {/* ✅ Dashboard ONLY (no hero, no other page sections) */}
-      <section
-        id="dashboard"
-        className="scroll-mt-24 mx-auto w-full max-w-7xl px-6 pt-10 pb-8 lg:px-8 space-y-6"
-      >
-        {/* Quick actions */}
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-sm text-[var(--muted)]">
-            Small actions, big impact — your latest sustainable wins.
-          </p>
-          <div className="flex gap-2">
-            <Button onClick={() => alert("TODO: Connect Plaid")}>
-              <CreditCard size={16} /> Connect
-            </Button>
-          </div>
+    <section className="mx-auto w-full max-w-7xl px-6 pt-10 pb-8 lg:px-8 space-y-6">
+      {/* Header / quick actions */}
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm text-[var(--muted)]">
+          Small actions, big impact — your latest sustainable wins.
+        </p>
+        <div className="flex gap-2">
+          <Button onClick={() => alert("TODO: Connect Plaid")}>
+            <CreditCard size={16} /> Connect
+          </Button>
         </div>
+      </div>
 
-        {/* KPI Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat
-            title="Eco-Wallet"
-            value={`$${walletUSD}`}
-            icon={<Leaf size={18} />}
-            desc="Cashback from green purchases"
-          />
-          <Stat
-            title="Monthly Green Score"
-            value={`${ecoPct}%`}
-            icon={<TrendingUp size={18} />}
-          >
-            <div className="mt-2">
-              <Progress value={ecoPct} />
-            </div>
-          </Stat>
-          <Stat
-            title="Eco Points"
-            value={ecoPoints}
-            icon={<Sparkles size={18} />}
-          />
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Recent activity</CardTitle>
-              <CardDescription>Last 3 purchases</CardDescription>
-            </CardHeader>
-            <CardContent className="divide-y divide-white/10 p-0">
-              {transactions.slice(0, 3).map((t) => (
-                <div
-                  key={t.id}
-                  className="p-4 flex items-center justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate">{t.merchant}</p>
-                    <p className="text-xs text-[var(--muted)]">{t.date}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {t.eco === null ? (
-                      <Badge variant="default">Unlabeled</Badge>
-                    ) : t.eco ? (
-                      <Badge variant="eco">Eco +</Badge>
-                    ) : (
-                      <Badge variant="danger">Not eco</Badge>
-                    )}
-                    <span className="tabular-nums">
-                      {t.amount < 0 ? "-" : ""}${Math.abs(t.amount).toFixed(2)}
-                    </span>
-                  </div>
+      {/* KPI Cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat
+          title="Eco-Wallet"
+          value={`$${walletUSD}`}
+          icon={<Leaf size={18} />}
+          desc="Cashback from green purchases"
+        />
+        <Stat
+          title="Monthly Green Score"
+          value={`${ecoPct}%`}
+          icon={<TrendingUp size={18} />}
+        >
+          <div className="mt-2">
+            <Progress value={ecoPct} />
+          </div>
+        </Stat>
+        <Stat
+          title="Eco Points"
+          value={ecoPoints}
+          icon={<Sparkles size={18} />}
+        />
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Recent activity</CardTitle>
+            <CardDescription>Last 3 purchases</CardDescription>
+          </CardHeader>
+          <CardContent className="divide-y divide-white/10 p-0">
+            {transactions.slice(0, 3).map((t) => (
+              <div key={t.id} className="p-4 flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="truncate">{t.merchant}</p>
+                  <p className="text-xs text-[var(--muted)]">{t.date}</p>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </>
+                <div className="flex items-center gap-3">
+                  {t.eco === null ? (
+                    <Badge variant="default">Unlabeled</Badge>
+                  ) : t.eco ? (
+                    <Badge variant="eco">Eco +</Badge>
+                  ) : (
+                    <Badge variant="danger">Not eco</Badge>
+                  )}
+                  <span className="tabular-nums">
+                    {t.amount < 0 ? "-" : ""}${Math.abs(t.amount).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </section>
   );
 }
 

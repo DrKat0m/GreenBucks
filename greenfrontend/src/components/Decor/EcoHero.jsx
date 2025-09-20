@@ -2,24 +2,10 @@
 import { useNavigate } from "react-router-dom";
 import greenbkg from "../../assets/greenbkg.jpeg";
 
-export default function EcoHero({ onOpenDashboard }) {
-  const name = "Aarya";
+export default function EcoHero() {
+  const name = "Aarya"; // you can pull from store if needed
   const NAVBAR_H = 72; // match your sticky header height
   const navigate = useNavigate();
-
-  const scrollToId = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const handleOpenDashboard = () => {
-    if (typeof onOpenDashboard === "function") onOpenDashboard();
-    else scrollToId("dashboard");
-  };
-
-  const handleLearnMore = () => {
-    navigate("/about"); // ⬅️ Always navigate to About page
-  };
 
   return (
     <section
@@ -51,14 +37,14 @@ export default function EcoHero({ onOpenDashboard }) {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <button
-              onClick={handleOpenDashboard}
+              onClick={() => navigate("/dashboard")}
               className="rounded-2xl bg-emerald-500/90 px-5 py-3 font-semibold text-black hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             >
               Open dashboard
             </button>
 
             <button
-              onClick={handleLearnMore}
+              onClick={() => navigate("/about")}
               className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-5 py-3 hover:bg-white/10"
             >
               Learn more

@@ -22,10 +22,7 @@ export default function Transactions() {
   );
 
   return (
-    <section
-      id="transactions"
-      className="scroll-mt-24 mx-auto w-full max-w-7xl px-6 pt-10 pb-16 lg:px-8"
-    >
+    <section className="mx-auto w-full max-w-7xl px-6 pt-10 pb-16 lg:px-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Transactions</h1>
         <p className="mt-1 text-white/60">
@@ -63,10 +60,15 @@ export default function Transactions() {
                 </div>
               </div>
             ))}
+            {tx.length === 0 && (
+              <div className="p-4 text-sm text-white/60">
+                No transactions yet.
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Right: uploader (constrained width, not full-bleed) */}
+        {/* Right: uploader */}
         <Card className="h-fit lg:sticky lg:top-24">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Upload receipt</CardTitle>
