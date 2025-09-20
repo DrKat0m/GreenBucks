@@ -1,8 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import AppLayout from "./components/Layout/AppLayout.jsx";
-import Dashboard from "./routes/Dashboard.jsx";
-import Transactions from "./routes/Transactions.jsx";
-import Auth from "./routes/Auth.jsx";
+import AppLayout from "./components/Layout/AppLayout";
+import Auth from "./routes/Auth";
+import Home from "./routes/Home";
+import Dashboard from "./routes/Dashboard";
+import Transactions from "./routes/Transactions";
+import About from "./routes/About";
 import useStore from "./lib/store";
 
 function PrivateRoute({ children }) {
@@ -21,11 +23,15 @@ export default function App() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Dashboard />} />
-        <Route path="/transactions" element={<Transactions />} />
-        <Route path="/leaderboard" element={<div>Leaderboard</div>} />
-        <Route path="/coach" element={<div>Coach</div>} />
+        {/* Home now includes Hero + Dashboard */}
+        <Route index element={<Home />} />
+
+        {/* keep direct routes too */}
+        <Route path="transactions" element={<Transactions />} />
+        <Route path="about" element={<About />} />
+        {/* ...other routes */}
       </Route>
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
