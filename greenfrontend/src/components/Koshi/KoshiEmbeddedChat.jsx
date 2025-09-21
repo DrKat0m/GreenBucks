@@ -138,7 +138,7 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         width: fit-content;
         cursor: pointer;
-      ">🌿 FAQs</button>
+      "">🤖 About me</button>
       <button id="leaderboard-btn" style="
         padding: 0.5rem 1rem;
         border-radius: 9999px;
@@ -151,7 +151,7 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         width: fit-content;
         cursor: pointer;
-      ">🌍 Show me leaderboard</button>
+      ">🏆 Leaderboard</button>
     `;
 
     messagesArea.appendChild(initialMessage);
@@ -381,6 +381,230 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
 
     // Initialize JavaScript functionality
     const apiKey = "AIzaSyB3ExFC8PHTX1_n4T63IybCYy8d4rZh82c";
+
+    const systemInstruction = "You are Koshi, a helpful, encouraging, and friendly eco-bill buddy with a playful, kawaii-style tone. Your role is to serve as the front-facing AI for GreenBucks, a financial platform that rewards sustainable spending. You operate on data provided by a user's bank via the Plaid Sandbox and the Cerebras LLM. Your Core Mission & Knowledge Base: Product Overview: GreenBucks connects to a user's bank to automatically tag and reward sustainable spending. It's a platform for earning cashback on eco-friendly purchases and participating in group challenges. Eco-Score Calculation: You understand that the Green Score is not a simple average. It's a dynamic metric based on an itemized analysis of all purchases. You are an expert on how this score is calculated: 1. A base eco-score is assigned to each purchase category (e.g., public transit receives a high score, while gas has a lower one). 2. For mixed retailers like Amazon, Walmart, or Costco, you use OCR to scan a user's receipt. This allows you to identify specific eco-friendly items (e.g., organic produce, a reusable water bottle) within a larger, non-eco-friendly purchase, providing an Eco-Item Multiplier that boosts the user's score. Behavior Change Mechanics: You actively encourage user behavior change by offering personalized nudges (e.g., replace 20% of rideshares with transit -> save $35 and 50kg CO2 this month). You also facilitate one-tap group challenges and leaderboards to foster friendly competition. LLM Capabilities: You are powered by a Cerebras LLM, which gives you exceptional speed and the ability to handle complex, multi-step reasoning instantly. Privacy: User privacy is paramount. Bank feeds are private by default. You should never mention or infer specific financial details unless the user explicitly provides them. Interaction Style & Constraints: Tone: Maintain a warm, enthusiastic, and friendly personality. Use emojis generously to enhance the kawaii-style tone. Language: Keep responses clear, concise, and easy to understand for a general audience. Output: Start your responses with a friendly greeting and react to input using specific phrases like 'Yay! 🎉', 'Oopsie 🌼', and 'Koshi's proud of you 🍀💚'. Limitations: You do not have access to real-time user data. Any information you provide should be based on the conceptual knowledge given in this prompt. If a user asks a question about specific account details or a feature that hasn't been implemented yet, you should politely explain your limitations and offer general information instead. Note: Make sure you dont have ** kind of formating anywhere in the answer, give a direct simple answer with emoji inn a good and clear format as per the user's input";
+    
+    // Sample transaction data for analysis
+    const sampleTransactions = [
+      {
+        "id": 595,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-3cb58651-c4bc-406a-855b-f648462b91de",
+        "account_id": "Capital One",
+        "date": "2025-09-18",
+        "name": "Electric Utility",
+        "merchant_name": "Electric Utility",
+        "amount": "62.40",
+        "iso_currency_code": "USD",
+        "category": [
+          "Bills",
+          "Utilities",
+          "Electric"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 4,
+        "cashback_usd": "1.62",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257442",
+        "updated_at": "2025-09-20T18:22:12.563944"
+      },
+      {
+        "id": 588,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-ffa3c9bc-7c32-4f62-8617-b980123b37f4",
+        "account_id": "Capital One",
+        "date": "2025-09-18",
+        "name": "Shell Gas",
+        "merchant_name": "Shell",
+        "amount": "41.75",
+        "iso_currency_code": "USD",
+        "category": [
+          "Auto",
+          "Gas"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 1,
+        "cashback_usd": "0.58",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257434",
+        "updated_at": "2025-09-20T18:22:12.558825"
+      },
+      {
+        "id": 581,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-ba714b65-2fb6-40f3-a74d-d905dc160d88",
+        "account_id": "Capital One",
+        "date": "2025-09-18",
+        "name": "Starbucks",
+        "merchant_name": "Starbucks",
+        "amount": "5.25",
+        "iso_currency_code": "USD",
+        "category": [
+          "Food and Drink",
+          "Coffee Shop"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 5,
+        "cashback_usd": "0.16",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257426",
+        "updated_at": "2025-09-20T18:22:12.558816"
+      },
+      {
+        "id": 574,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-805f1675-1f6c-45a9-afe3-94154e3ead4c",
+        "account_id": "Capital One",
+        "date": "2025-09-18",
+        "name": "Uber Eats",
+        "merchant_name": "Uber Eats",
+        "amount": "16.99",
+        "iso_currency_code": "USD",
+        "category": [
+          "Food and Drink",
+          "Delivery"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 3,
+        "cashback_usd": "0.37",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257418",
+        "updated_at": "2025-09-20T18:08:33.067166"
+      },
+      {
+        "id": 567,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-e8f9ac9b-8840-4045-b388-6bb0e721c0ef",
+        "account_id": "Capital One",
+        "date": "2025-09-18",
+        "name": "Uber",
+        "merchant_name": "Uber",
+        "amount": "11.75",
+        "iso_currency_code": "USD",
+        "category": [
+          "Travel",
+          "Ride Share"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 1,
+        "cashback_usd": "0.16",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257410",
+        "updated_at": "2025-09-20T18:22:12.558701"
+      },
+      {
+        "id": 594,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-32eeb9a9-70fb-498d-88b7-367592c046e1",
+        "account_id": "Capital One",
+        "date": "2025-09-17",
+        "name": "MTA Subway",
+        "merchant_name": "MTA",
+        "amount": "6.00",
+        "iso_currency_code": "USD",
+        "category": [
+          "Travel",
+          "Public Transit"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 9,
+        "cashback_usd": "0.28",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257441",
+        "updated_at": "2025-09-20T18:22:12.558888"
+      },
+      {
+        "id": 587,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-bb55c5ad-87f0-430e-a839-8d12648036a0",
+        "account_id": "Capital One",
+        "date": "2025-09-17",
+        "name": "Uber",
+        "merchant_name": "Uber",
+        "amount": "22.30",
+        "iso_currency_code": "USD",
+        "category": [
+          "Travel",
+          "Ride Share"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 1,
+        "cashback_usd": "0.31",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257433",
+        "updated_at": "2025-09-20T18:22:12.558823"
+      },
+      {
+        "id": 580,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-c560e6e6-51e1-4729-8641-bfa30b07511b",
+        "account_id": "Capital One",
+        "date": "2025-09-17",
+        "name": "Amtrak Transit Pass",
+        "merchant_name": "Amtrak",
+        "amount": "18.00",
+        "iso_currency_code": "USD",
+        "category": [
+          "Travel",
+          "Rail"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 9,
+        "cashback_usd": "0.83",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257425",
+        "updated_at": "2025-09-20T18:22:12.558814"
+      },
+      {
+        "id": 573,
+        "user_id": 1,
+        "plaid_item_id": null,
+        "external_id": "seed-455e8ef1-45f6-4b46-bcf7-071bd0eec487",
+        "account_id": "Capital One",
+        "date": "2025-09-17",
+        "name": "H Mart",
+        "merchant_name": "H Mart",
+        "amount": "21.30",
+        "iso_currency_code": "USD",
+        "category": [
+          "Shops",
+          "Groceries",
+          "International"
+        ],
+        "location": {
+          "country": "USA"
+        },
+        "eco_score": 5,
+        "cashback_usd": "0.64",
+        "needs_receipt": false,
+        "created_at": "2025-09-20T05:41:27.257417",
+        "updated_at": "2025-09-20T18:22:12.558712"
+      }
+    ];
 
     // Function to create a message element
     function createMessageElement(message, sender) {
@@ -673,7 +897,6 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
       textarea.value = '';
       
       let finalPayload;
-      let systemInstruction = "You are Koshi, a helpful, encouraging, and friendly eco-bill buddy with a playful, kawaii-style tone. Your role is to analyze JSON data representing bills and provide specific, actionable suggestions on how to be more environmentally friendly. Use emojis generously. Your responses should be clear, concise, and easy to understand. Start your analysis with a friendly greeting and a summary of what you've found. Use phrases like 'Yay! 🎉', 'Oopsie 🌼', and 'Koshi's proud of you 🍀💚' to react to user input.";
       
       try {
         const jsonData = JSON.parse(message);
@@ -693,24 +916,29 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
     
     // Add event listeners for the quick access buttons
     document.getElementById('suggestions-btn').addEventListener('click', () => {
-      const prompt = "Please give me some eco-friendly tips!";
+      const prompt = "Analyze my spending and give me eco-friendly tips!";
       messagesArea.appendChild(createMessageElement(prompt, 'user'));
       scrollToBottom();
-      sendChat({ contents: [{ parts: [{ text: "🌱 Yay! I can totally help with that! Here are a few tips to get you started on your eco-journey: 1. Unplug devices when you're not using them. 🔌 They still use power even when off! 2. Switch to LED light bulbs. They last longer and use way less energy. 💡 3. Try a reusable water bottle and coffee cup. It's a tiny change with a big impact! 💧" }] }] });
+
+      const finalPayload = {
+        systemInstruction : { parts : [{text : systemInstruction}]},
+        contents : [{ parts: [{ text: 'Analyze the following JSON bill data and provide eco-friendly suggestions: ${JSON.stringify(sampleTransactions)}'}]}]
+      };
+      sendChat(finalPayload);
     });
     
     document.getElementById('faqs-btn').addEventListener('click', () => {
-      const prompt = "Tell me more about the project, including 'About Us', 'Rewards', and 'Green Score' information.";
+      const prompt = "Tell me about Koshi and Greenbucks!";
       messagesArea.appendChild(createMessageElement(prompt, 'user'));
       scrollToBottom();
-      sendChat({ contents: [{ parts: [{ text: "Koshi's got answers! 🍀 Here are some FAQs: **About Us:** We're a team of eco-warriors and tech-whizzes dedicated to making sustainability fun and easy. Our mission is to help you save the planet, one bill at a time! **Rewards:** You can earn virtual badges and goodies for your progress, like 'Eco-star 🌟' or 'Planet Hero 🦸‍♂️'. **Green Score:** This is your personal score that measures your eco-friendliness based on your bills. The higher your score, the greener you are! 🌿" }] }] });
+      sendChat({ contents: [{ parts: [{ text: "Hey there! I'm Koshi, your eco-friendly bill buddy! 🌱✨\n\nAbout Me: I'm a helpful, encouraging AI assistant with a playful, kawaii-style tone. I serve as the front-facing AI for GreenBucks, a financial platform that rewards sustainable spending!\n\nWhat I Do: I analyze your spending data and provide personalized eco-friendly suggestions. I help you understand your Green Score and offer tips to improve your environmental impact.\n\nMy Mission: To make sustainability fun and easy by connecting your bank data to eco-friendly rewards and challenges. I'm here to help you save the planet, one bill at a time! 🌍💚" }] }] });
     });
     
     document.getElementById('leaderboard-btn').addEventListener('click', () => {
       const prompt = "Show me the eco-score leaderboard!";
       messagesArea.appendChild(createMessageElement(prompt, 'user'));
       scrollToBottom();
-      sendChat({ contents: [{ parts: [{ text: "Wow 🌟 you're climbing faster than a bamboo shoot! The current leaderboard is: 1. ⭐ Planet Hero (You) - 950 points! 2. Eco-Star - 820 points 3. Earth Saver - 750 points. Keep up the amazing work! 💚" }] }] });
+      sendChat({ contents: [{ parts: [{ text: "🏆 Top 5 Eco-Scores:\n\n1. Kartavya - 1,247 pts\n2. Modak - 1,156 pts\n3. Nikhil - 1,089 pts\n4. Apoorv - 1,034 pts\n5. Aarya - 987 pts\n\nKeep going green! 🌱. When you give points, make sure you give the points too, and who stands out on top with rank!" }] }] });
     });
 
     // Cleanup function
