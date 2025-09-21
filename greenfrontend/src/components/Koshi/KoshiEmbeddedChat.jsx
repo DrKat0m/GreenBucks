@@ -938,7 +938,7 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
       const prompt = "Show me the eco-score leaderboard!";
       messagesArea.appendChild(createMessageElement(prompt, 'user'));
       scrollToBottom();
-      sendChat({ contents: [{ parts: [{ text: "🏆 Top 5 Eco-Scores:\n\n1. Kartavya - 1,247 pts\n2. Modak - 1,156 pts\n3. Nikhil - 1,089 pts\n4. Apoorv - 1,034 pts\n5. Aarya - 987 pts\n\nKeep going green! 🌱. When you give points, make sure you give the points too, and who stands out on top with rank!" }] }] });
+      sendChat({ contents: [{ parts: [{ text: "🏆 Top 5 Eco-Scores:\n\n1. Kartavya - 1,247 pts\n2. Modak - 1,156 pts\n3. Nikhil - 1,089 pts\n4. Aarya - 1,034 pts\n5. Apoorv - 987 pts\n\nKeep going green! 🌱. When you give points, make sure you give the points too, and who stands out on top with rank!" }] }] });
     });
 
     // Cleanup function
