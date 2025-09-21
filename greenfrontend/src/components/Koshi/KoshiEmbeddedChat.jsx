@@ -921,8 +921,8 @@ export default function KoshiEmbeddedChat({ open, onClose }) {
       scrollToBottom();
 
       const finalPayload = {
-        systemInstruction : { parts : [{text : systemInstruction}]},
-        contents : [{ parts: [{ text: 'Analyze the following JSON bill data and provide eco-friendly suggestions: ${JSON.stringify(sampleTransactions)}'}]}]
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        contents: [{ parts: [{ text: `⁠Analyze the following JSON bill data and provide eco-friendly suggestions: ${JSON.stringify(sampleTransactions)}`}] }]
       };
       sendChat(finalPayload);
     });
