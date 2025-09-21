@@ -2,6 +2,12 @@
 
 **Made with 💚 @ PennApps XXVI**
 
+### 👥 Team Members
+- **Apoorv Thite**
+- **Aarya Soni** 
+- **Kartavya Suhagiya** 
+- **Nikhil Saini**
+
 A revolutionary fintech application that rewards sustainable spending through AI-powered eco-scoring, real bank integration, and personalized environmental insights.
 
 ![GreenBucks Logo](greenfrontend/src/assets/greenbucks_logo.svg)
@@ -173,13 +179,18 @@ Our proprietary eco-scoring algorithm analyzes transactions using:
 3. **Receipt Analysis**: Item-level scoring for mixed retailers
 4. **Dynamic Adjustments**: Scores evolve with spending patterns
 
-### 🤖 Koshi AI Assistant
+### 🤖 Meet Koshi: Your Eco-Friendly AI Companion
 
-Powered by Google Gemini AI for intelligent responses:
-- **Personalized Tips**: Analyzes your specific spending patterns
-- **Behavior Nudges**: Suggests eco-friendly alternatives
-- **Progress Tracking**: Celebrates improvements and milestones
-- **Educational Content**: Explains environmental impact of purchases
+**Why "Koshi"?** In Sanskrit, "Koshi" (कोशी) means "treasury" or "treasure chest" - perfectly embodying our AI assistant who helps you discover the hidden treasures of sustainable living while building your eco-wallet. Just as a treasury holds valuable resources, Koshi holds the wisdom to transform your spending habits into environmental rewards.
+
+**Koshi's Capabilities:**
+- **Personalized Analysis**: Examines your unique spending patterns using real transaction data
+- **Smart Recommendations**: Suggests eco-friendly alternatives based on your lifestyle
+- **Behavioral Coaching**: Provides gentle nudges toward more sustainable choices
+- **Environmental Education**: Explains the CO2 impact of your purchases in simple terms
+- **Progress Celebration**: Acknowledges your eco-improvements and milestones
+- **Interactive Chat**: Powered by Google Gemini AI for natural, helpful conversations
+- **Voice Integration**: Supports speech-to-text and text-to-speech for accessibility
 
 ### 📱 Receipt OCR System
 
@@ -232,9 +243,9 @@ Dynamic reward system based on eco-scores:
 ### 🏆 Leaderboard & Achievements
 ```
 Top Eco-Warriors:
-1. Kartavya - 1,247 pts  2. Modak - 1,156 pts  3. Nikhil - 1,089 pts
+
 ```
-**Achievement Badges:** Eco++ Streak, Carbon Saver, Transit Hero, Green Shopper
+**Achievement Badges:** Eco++ Streak, Carbon Saver, Transit Hero, Green Shopper (Future Scope)
 
 ## 🔒 Security & Privacy
 
@@ -415,11 +426,6 @@ POST /plaid/sync          # Sync transactions from Plaid
 
 **Built by passionate developers at PennApps XXVI**
 
-### 👥 Team Members
-- **Apoorv Thite** - Full-Stack Developer & Project Lead
-- **Aarya Soni** - Backend Engineer & AI Integration
-- **Kartavya Suhagiya** - Frontend Developer & UI/UX Design
-- **Nikhil Saini** - Data Engineer & Analytics
 
 ## 🙏 Acknowledgments
 
