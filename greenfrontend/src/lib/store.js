@@ -98,6 +98,8 @@ const useStore = create((set, get) => ({
         limit: 50,
         sort_by: 'date',
         sort_dir: 'desc',
+        // Add cache busting parameter
+        _t: Date.now(),
         ...params
       });
       
@@ -126,6 +128,19 @@ const useStore = create((set, get) => ({
         transactionsLoading: false 
       });
     }
+  },
+
+  // Force refresh transactions (clear cache and refetch)
+  forceRefreshTransactions: async () => {
+    console.log('Force refreshing transactions...');
+    const user = get().user;
+    if (!user?.id) return;
+
+    // Clear current transactions
+    set({ transactions: [], transactionsLoading: true, transactionsError: null });
+    
+    // Fetch fresh data
+    await get().fetchTransactions();
   },
 
   // Sync transactions from Plaid

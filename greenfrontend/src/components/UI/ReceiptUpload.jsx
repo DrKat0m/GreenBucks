@@ -3,12 +3,14 @@ import { useState, useRef } from 'react';
 import { Upload, FileImage, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from './Button';
 import { receiptsAPI } from '../../lib/api';
+import ReceiptItemsPopup from './ReceiptItemsPopup';
 
-export default function ReceiptUpload({ selectedTransactionId, onUploadSuccess, onUploadError }) {
+export default function ReceiptUpload({ selectedTransactionId, selectedTransaction, onUploadSuccess, onUploadError }) {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState(null);
+  const [showItemsPopup, setShowItemsPopup] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileSelect = (event) => {
@@ -41,14 +43,34 @@ export default function ReceiptUpload({ selectedTransactionId, onUploadSuccess, 
 
     setUploading(true);
     try {
+      // Upload with selected transaction ID (backend might require it)
       const response = await receiptsAPI.upload(file, selectedTransactionId);
       setResult({
         success: true,
         data: response
       });
-      onUploadSuccess?.(response);
+      // Show the popup with parsed items for review
+      setShowItemsPopup(true);
     } catch (error) {
-      const errorMessage = error.response?.data?.detail || 'Upload failed';
+      console.error('Upload error:', error);
+      let errorMessage = 'Upload failed';
+      
+      if (error.response?.data?.detail) {
+        // Handle different error formats
+        const detail = error.response.data.detail;
+        if (typeof detail === 'string') {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          errorMessage = detail.map(err => err.msg || err.message || String(err)).join(', ');
+        } else if (detail.msg) {
+          errorMessage = detail.msg;
+        } else {
+          errorMessage = JSON.stringify(detail);
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       setResult({
         success: false,
         error: errorMessage
@@ -59,10 +81,23 @@ export default function ReceiptUpload({ selectedTransactionId, onUploadSuccess, 
     }
   };
 
+  const handleConfirmAttachment = async (receiptData, transaction) => {
+    try {
+      // Receipt is already attached during upload, just confirm and refresh
+      onUploadSuccess?.(receiptData);
+      resetUpload();
+    } catch (error) {
+      console.error('Confirmation error:', error);
+      onUploadError?.('Failed to confirm receipt attachment');
+      throw error;
+    }
+  };
+
   const resetUpload = () => {
     setFile(null);
     setPreview(null);
     setResult(null);
+    setShowItemsPopup(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -138,75 +173,35 @@ export default function ReceiptUpload({ selectedTransactionId, onUploadSuccess, 
         </p>
       )}
 
-      {/* Results */}
-      {result && (
-        <div className={`p-4 rounded-lg border ${
-          result.success 
-            ? 'bg-green-500/20 border-green-500/30' 
-            : 'bg-red-500/20 border-red-500/30'
-        }`}>
-          {result.success ? (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <CheckCircle size={16} className="text-green-400" />
-                <span className="text-green-400 font-medium">Receipt processed successfully!</span>
-              </div>
-              
-              {result.data.parsed_data && (
-                <div className="text-sm space-y-1">
-                  {result.data.parsed_data.merchant && (
-                    <p><span className="text-white/60">Merchant:</span> {result.data.parsed_data.merchant}</p>
-                  )}
-                  {result.data.parsed_data.total && (
-                    <p><span className="text-white/60">Total:</span> ${result.data.parsed_data.total}</p>
-                  )}
-                  {result.data.parsed_data.date && (
-                    <p><span className="text-white/60">Date:</span> {result.data.parsed_data.date}</p>
-                  )}
-                  {result.data.parsed_data.items && result.data.parsed_data.items.length > 0 && (
-                    <div>
-                      <p className="text-white/60">Items:</p>
-                      <ul className="ml-4 text-xs space-y-1">
-                        {result.data.parsed_data.items.slice(0, 5).map((item, idx) => (
-                          <li key={idx}>• {item.name} - ${item.price}</li>
-                        ))}
-                        {result.data.parsed_data.items.length > 5 && (
-                          <li className="text-white/40">... and {result.data.parsed_data.items.length - 5} more items</li>
-                        )}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={resetUpload}
-                className="mt-2"
-              >
-                Upload Another Receipt
-              </Button>
+      {/* Results - Only show errors, success is handled by popup */}
+      {result && !result.success && (
+        <div className="p-4 rounded-lg border bg-red-500/20 border-red-500/30">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <XCircle size={16} className="text-red-400" />
+              <span className="text-red-400 font-medium">Upload failed</span>
             </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <XCircle size={16} className="text-red-400" />
-                <span className="text-red-400 font-medium">Upload failed</span>
-              </div>
-              <p className="text-sm text-red-300">{result.error}</p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={resetUpload}
-                className="mt-2"
-              >
-                Try Again
-              </Button>
-            </div>
-          )}
+            <p className="text-sm text-red-300">{result.error}</p>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={resetUpload}
+              className="mt-2"
+            >
+              Try Again
+            </Button>
+          </div>
         </div>
       )}
+
+      {/* Receipt Items Popup */}
+      <ReceiptItemsPopup
+        isOpen={showItemsPopup}
+        onClose={() => setShowItemsPopup(false)}
+        receiptData={result?.data}
+        selectedTransaction={selectedTransaction}
+        onConfirmAttachment={handleConfirmAttachment}
+      />
     </div>
   );
 }

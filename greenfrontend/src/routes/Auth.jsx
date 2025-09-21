@@ -13,6 +13,7 @@ import { Input } from "../components/UI/Input";
 import { Label } from "../components/UI/Label";
 import { Button } from "../components/UI/Button";
 import EcoBackground from "../components/Decor/EcoBackground";
+import Footer from "../components/Layout/Footer";
 import logo from "../assets/greenbucks_logo.svg";
 
 export default function Auth() {
@@ -47,9 +48,10 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen grid place-items-center relative">
+    <div className="min-h-screen flex flex-col relative">
       <EcoBackground />
-      <Card className="w-full max-w-md backdrop-blur">
+      <div className="flex-1 grid place-items-center">
+        <Card className="w-full max-w-md backdrop-blur">
         <CardHeader>
           <div className="flex items-center gap-2">
             <img src={logo} alt="GreenBucks" className="h-7 w-7" />
@@ -124,7 +126,9 @@ export default function Auth() {
             </p>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
+      <Footer />
     </div>
   );
 }

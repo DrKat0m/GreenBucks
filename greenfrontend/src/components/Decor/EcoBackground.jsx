@@ -11,9 +11,10 @@ export default function EcoBackground() {
   const { pathname } = useLocation();
   const onDashboard = pathname === "/dashboard";
   const onHome = pathname === "/";
+  const onAuth = pathname === "/auth";
   
-  // Show background on dashboard, transactions, and about pages
-  const shouldShow = pathname === "/dashboard" || pathname === "/transactions" || pathname === "/about";
+  // Show background on dashboard, transactions, about, and auth pages
+  const shouldShow = pathname === "/dashboard" || pathname === "/transactions" || pathname === "/about" || pathname === "/auth";
   
   if (!shouldShow) return null;
 
@@ -28,8 +29,12 @@ export default function EcoBackground() {
         alt=""
         className={cn(
           "h-full w-full object-cover scale-105 transition-all duration-500",
-          // Dial the blur down a notch on the dashboard so the hero can melt into it
-          onDashboard ? "blur-[5px] opacity-[0.22]" : "blur-[7px] opacity-[0.18]"
+          // Dial the blur down a notch on the dashboard so the hero can blend into it
+          onDashboard ? "blur-[5px] opacity-[0.22]" : 
+          // Auth page gets a nice subtle background
+          onAuth ? "blur-[6px] opacity-[0.25]" :
+          // Default for other pages
+          "blur-[7px] opacity-[0.18]"
         )}
       />
 

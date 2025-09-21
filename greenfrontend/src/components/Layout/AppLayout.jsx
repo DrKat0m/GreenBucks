@@ -6,6 +6,7 @@ import { Button } from "../UI/Button";
 import { cn } from "../../lib/cn";
 import logo from "../../assets/greenbucks_logo.svg";
 import KoshiHTMLButton from "../Koshi/KoshiHTMLButton";
+import Footer from "./Footer";
 
 // 🔻 lazy-loaded decor & chat (keep initial bundle lean)
 const PageBackdrop = lazy(() => import("../Decor/PageBackdrop"));
@@ -45,13 +46,13 @@ export default function AppLayout() {
       </Suspense>
 
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--bg-2)]/80 backdrop-blur">
-        <div className="shell h-16 flex items-center justify-between">
+        <div className="shell h-20 flex items-center justify-between">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center gap-3 shrink-0"
           >
-            <img src={logo} alt="GreenBucks" className="h-16 w-auto" />
-            <span className="sr-only">GreenBucks</span>
+            <img src={logo} alt="GreenBucks" className="h-14 w-auto" />
+            <span className="text-lg font-semibold text-white tracking-wide">GREENBUCKS</span>
           </button>
 
           <nav className="flex items-center gap-6">
@@ -102,6 +103,8 @@ export default function AppLayout() {
       <main className="w-full min-h-[calc(100vh-4rem)] relative z-10">
         <Outlet />
       </main>
+
+      <Footer />
 
       <KoshiHTMLButton 
         onToggle={() => setChatOpen(!chatOpen)} 

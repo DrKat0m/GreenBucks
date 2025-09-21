@@ -127,6 +127,14 @@ export const receiptsAPI = {
     });
     return response.data;
   },
+  
+  attachToTransaction: async (receiptId, transactionId) => {
+    const response = await api.post('/receipts/attach', {
+      receipt_id: receiptId,
+      transaction_id: transactionId,
+    });
+    return response.data;
+  },
 };
 
 // Plaid API

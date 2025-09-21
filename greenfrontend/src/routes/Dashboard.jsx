@@ -19,21 +19,39 @@ import PlaidLink from "../components/UI/PlaidLink";
 // import ApiTest from "../components/Util/ApiTest";
 
 export default function Dashboard() {
-  const tx = useStore((s) => s.transactions);
+  const allTransactions = useStore((s) => s.transactions);
   const transactionsLoading = useStore((s) => s.transactionsLoading);
   const transactionsError = useStore((s) => s.transactionsError);
   const fetchTransactions = useStore((s) => s.fetchTransactions);
+  const forceRefreshTransactions = useStore((s) => s.forceRefreshTransactions);
   const user = useStore((s) => s.user);
   const nav = useNavigate();
 
-  // Fetch transactions when component mounts
-  useEffect(() => {
-    if (user && tx.length === 0 && !transactionsLoading) {
-      fetchTransactions();
+  // Filter out transactions without categories (same as Transactions page)
+  const transactions = useMemo(() => {
+    const filtered = allTransactions.filter(transaction => {
+      const hasCategory = transaction.category && 
+                         Array.isArray(transaction.category) && 
+                         transaction.category.length > 0;
+      return hasCategory;
+    });
+    
+    // Debug: Log filtering results
+    const filteredCount = allTransactions.length - filtered.length;
+    if (filteredCount > 0) {
+      console.log(`Dashboard: Filtered out ${filteredCount} transactions without categories`);
     }
-  }, [user, fetchTransactions, tx.length, transactionsLoading]);
+    
+    return filtered;
+  }, [allTransactions]);
 
-  const transactions = tx;
+  // Fetch fresh transactions when component mounts
+  useEffect(() => {
+    if (user && !transactionsLoading) {
+      // Always fetch fresh data to ensure updated eco-scores are shown
+      forceRefreshTransactions();
+    }
+  }, [user, forceRefreshTransactions]);
 
   const { ecoPct, ecoPoints, walletUSD } = useMemo(() => {
     if (!transactions.length) return { ecoPct: 0, ecoPoints: 0, walletUSD: "0.00" };
@@ -73,9 +91,9 @@ export default function Dashboard() {
   }, [transactions]);
 
   const handlePlaidSuccess = (result, metadata) => {
-    // Refresh transactions to show newly synced data
+    // Refresh transactions to show newly synced data with updated eco-scores
     setTimeout(() => {
-      fetchTransactions();
+      forceRefreshTransactions();
     }, 2000);
   };
 
@@ -122,7 +140,7 @@ export default function Dashboard() {
               variant="secondary" 
               size="sm" 
               className="mt-2"
-              onClick={() => fetchTransactions()}
+              onClick={() => forceRefreshTransactions()}
             >
               Retry
             </Button>
@@ -184,16 +202,20 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent className="divide-y divide-white/10 p-0">
               {transactions.slice(0, 3).map((t) => {
-                const getEcoLabel = (ecoScore) => {
-                  if (!ecoScore) return { label: 'Needs receipt', variant: 'default', color: 'text-amber-400' };
+                const getEcoLabel = (ecoScore, hasCategory) => {
+                  if (!ecoScore) {
+                    if (!hasCategory) return { label: 'No category', variant: 'default', color: 'text-gray-400' };
+                    return { label: 'Needs receipt', variant: 'default', color: 'text-amber-400' };
+                  }
                   if (ecoScore >= 9) return { label: 'Eco++', variant: 'eco', color: 'text-emerald-400' };
                   if (ecoScore >= 7) return { label: 'Eco+', variant: 'eco', color: 'text-green-400' };
                   if (ecoScore >= 5) return { label: 'Neutral', variant: 'default', color: 'text-yellow-400' };
-                  if (ecoScore >= 3) return { label: 'Less-eco', variant: 'danger', color: 'text-orange-400' };
-                  return { label: 'Non-eco', variant: 'danger', color: 'text-red-400' };
+                  if (ecoScore >= 3) return { label: 'Less-Eco', variant: 'danger', color: 'text-orange-400' };
+                  return { label: 'Non-Eco', variant: 'danger', color: 'text-red-400' };
                 };
 
-                const ecoInfo = getEcoLabel(t.ecoScore);
+                const hasCategory = t.category && Array.isArray(t.category) && t.category.length > 0;
+                const ecoInfo = getEcoLabel(t.ecoScore, hasCategory);
                 
                 return (
                   <div

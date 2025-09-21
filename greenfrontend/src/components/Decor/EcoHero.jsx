@@ -1,10 +1,16 @@
 // src/components/Decor/EcoHero.jsx
 import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import useStore from "../../lib/store";
 import greenbkg from "../../assets/greenbkg.jpeg";
 
 export default function EcoHero({ onOpenDashboard }) {
-  const name = "Aarya";
-  const NAVBAR_H = 72; // match your sticky header height
+  const user = useStore((s) => s.user);
+  const name = useMemo(
+    () => (user?.name ? user.name.split(" ")[0] : "there"),
+    [user]
+  );
+  const NAVBAR_H = 80; // match your sticky header height (h-20 = 80px)
   const navigate = useNavigate();
 
   const handleOpenDashboard = () => {
@@ -34,26 +40,26 @@ export default function EcoHero({ onOpenDashboard }) {
 
       {/* Content */}
       <div className="relative mx-auto w-full max-w-7xl px-6 py-24 sm:py-28 lg:px-8">
-        <div className="max-w-3xl">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl">
-            Welcome back, <span className="text-emerald-300">{name}</span>
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-6xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
+            Welcome, <span className="text-emerald-300">{name}</span>
             <span className="align-super text-emerald-300/80">🌱</span>
           </h1>
-          <p className="mt-5 max-w-xl text-lg text-white/80">
+          <p className="mt-6 mx-auto max-w-2xl text-xl text-white/80">
             Sustainability is a daily habit, not a destination.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <button
               onClick={handleOpenDashboard}
-              className="rounded-2xl bg-emerald-500/90 px-5 py-3 font-semibold text-black hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              className="rounded-2xl bg-emerald-500/90 px-6 py-4 text-lg font-semibold text-black hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
             >
-              Open dashboard
+              Dashboard
             </button>
 
             <button
               onClick={handleLearnMore}
-              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-5 py-3 hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/5 px-6 py-4 text-lg hover:bg-white/10"
             >
               Learn more
             </button>

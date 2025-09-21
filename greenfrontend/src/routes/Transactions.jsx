@@ -14,10 +14,30 @@ import ReceiptUpload from "../components/UI/ReceiptUpload";
 import { Upload, CreditCard } from "lucide-react";
 
 export default function Transactions() {
-  const tx = useStore((s) => s.transactions) ?? [];
+  const allTransactions = useStore((s) => s.transactions) ?? [];
   const transactionsLoading = useStore((s) => s.transactionsLoading);
   const fetchTransactions = useStore((s) => s.fetchTransactions);
+  const forceRefreshTransactions = useStore((s) => s.forceRefreshTransactions);
   const user = useStore((s) => s.user);
+  
+  // Filter out transactions without categories
+  const tx = useMemo(() => {
+    const filtered = allTransactions.filter(transaction => {
+      const hasCategory = transaction.category && 
+                         Array.isArray(transaction.category) && 
+                         transaction.category.length > 0;
+      return hasCategory;
+    });
+    
+    // Debug: Log filtering results
+    const filteredCount = allTransactions.length - filtered.length;
+    if (filteredCount > 0) {
+      console.log(`Filtered out ${filteredCount} transactions without categories`);
+    }
+    
+    return filtered;
+  }, [allTransactions]);
+  
   const [selectedId, setSelectedId] = useState(tx[0]?.id);
   const [uploadMessage, setUploadMessage] = useState("");
   const [connectedBank, setConnectedBank] = useState(null);
@@ -25,10 +45,11 @@ export default function Transactions() {
 
   // Fetch transactions when component mounts
   useEffect(() => {
-    if (user && tx.length === 0 && !transactionsLoading) {
-      fetchTransactions();
+    if (user && !transactionsLoading) {
+      // Always fetch fresh data when component mounts
+      forceRefreshTransactions();
     }
-  }, [user, fetchTransactions, tx.length, transactionsLoading]);
+  }, [user, forceRefreshTransactions]);
 
   // Update selected transaction when transactions load
   useEffect(() => {
@@ -51,16 +72,22 @@ export default function Transactions() {
   );
 
   const handleUploadSuccess = (result) => {
-    setUploadMessage("Receipt processed successfully! Transaction updated with OCR data.");
-    // Refresh transactions to get updated data
+    setUploadMessage("Receipt processed successfully! Transaction updated with eco-score and cashback.");
+    // Immediately refresh transactions to show updated eco-scores
+    fetchTransactions();
+    // Clear message after a delay
     setTimeout(() => {
-      fetchTransactions();
       setUploadMessage("");
-    }, 2000);
+    }, 3000);
   };
 
   const handleUploadError = (error) => {
-    setUploadMessage(`Upload failed: ${error}`);
+    // Ensure error is a string
+    const errorString = typeof error === 'string' ? error : 
+                       error?.message || 
+                       JSON.stringify(error) || 
+                       'Unknown error';
+    setUploadMessage(`Upload failed: ${errorString}`);
     setTimeout(() => setUploadMessage(""), 5000);
   };
 
@@ -77,10 +104,34 @@ export default function Transactions() {
       className="scroll-mt-24 mx-auto w-full max-w-7xl px-6 pt-10 pb-16 lg:px-8"
     >
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Transactions</h1>
-        <p className="mt-1 text-white/60">
-          Your recent purchases and eco tags.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Transactions</h1>
+            <p className="mt-1 text-white/60">
+              Your recent purchases and eco tags.
+            </p>
+          </div>
+          <Button
+            onClick={forceRefreshTransactions}
+            disabled={transactionsLoading}
+            variant="secondary"
+            className="flex items-center gap-2"
+          >
+            {transactionsLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh Data
+              </>
+            )}
+          </Button>
+        </div>
         
         {/* Connected Bank Account Display */}
         {connectedBank && (
@@ -109,7 +160,10 @@ export default function Transactions() {
             <CardContent className="p-4">
               <div className="text-sm text-white/60">Total Spent</div>
               <div className="text-2xl font-semibold">
-                ${tx.reduce((sum, t) => sum + Math.abs(t.amount), 0).toFixed(2)}
+                ${tx.reduce((sum, t) => {
+                  const amount = Math.abs(parseFloat(t.amount) || 0);
+                  return sum + amount;
+                }, 0).toFixed(2)}
               </div>
             </CardContent>
           </Card>
@@ -117,7 +171,7 @@ export default function Transactions() {
             <CardContent className="p-4">
               <div className="text-sm text-white/60">Total Cashback</div>
               <div className="text-2xl font-semibold text-green-400">
-                ${tx.reduce((sum, t) => sum + (t.cashback || 0), 0).toFixed(2)}
+                ${tx.reduce((sum, t) => sum + (parseFloat(t.cashback) || 0), 0).toFixed(2)}
               </div>
             </CardContent>
           </Card>
@@ -125,7 +179,7 @@ export default function Transactions() {
             <CardContent className="p-4">
               <div className="text-sm text-white/60">Avg Eco Score</div>
               <div className="text-2xl font-semibold">
-                {tx.length > 0 ? (tx.reduce((sum, t) => sum + (t.ecoScore || 0), 0) / tx.length).toFixed(1) : '0.0'}
+                {tx.length > 0 ? (tx.reduce((sum, t) => sum + (parseFloat(t.ecoScore) || 0), 0) / tx.length).toFixed(1) : '0.0'}
               </div>
             </CardContent>
           </Card>
@@ -210,6 +264,7 @@ export default function Transactions() {
 
               <ReceiptUpload
                 selectedTransactionId={selectedId}
+                selectedTransaction={selected}
                 onUploadSuccess={handleUploadSuccess}
                 onUploadError={handleUploadError}
               />

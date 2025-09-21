@@ -9,11 +9,16 @@ from .item_category_map import lookup_kg_co2e_per_usd
 
 
 def _mock_estimate(name: str, price: float | None, qty: int | None, categories: Optional[Iterable[str]] = None) -> float:
-    """Category-aware deterministic estimate: factor(kgCO2e/$) * price."""
+    """Category-aware deterministic estimate: factor(kgCO2e/$) * price, capped at reasonable values."""
+    from .item_category_map import MAX_CO2E_PER_ITEM
+    
     factor = lookup_kg_co2e_per_usd(name or "", categories)
     if price is None:
         price = 1.0
-    return float(Decimal(str(factor)) * Decimal(str(price)))
+    
+    # Calculate CO2 and cap it at maximum value
+    co2e = float(Decimal(str(factor)) * Decimal(str(price)))
+    return min(co2e, MAX_CO2E_PER_ITEM)
 
 
 def _best_effort_search_money_factor(session: requests.Session, api_key: str, query: str) -> Optional[dict]:
@@ -135,6 +140,9 @@ async def estimate_item_footprint(
             res = _estimate_using_factor(session, settings.climatiq_api_key, factor, float(price))
             if res is not None:
                 co2e, fid = res
+                # Cap the live API result as well
+                from .item_category_map import MAX_CO2E_PER_ITEM
+                co2e = min(co2e, MAX_CO2E_PER_ITEM)
                 return (co2e, "live", fid)
         # 3) Fallback path: if we had sector hints but couldn't find a specific factor,
         #    prefer deterministic category mapping to avoid uniform scores.
@@ -146,6 +154,9 @@ async def estimate_item_footprint(
             res = _estimate_using_factor(session, settings.climatiq_api_key, generic_factor, float(price))
             if res is not None:
                 co2e, fid = res
+                # Cap the generic factor result as well
+                from .item_category_map import MAX_CO2E_PER_ITEM
+                co2e = min(co2e, MAX_CO2E_PER_ITEM)
                 return (co2e, "live", fid)
         # 4) Final fallback: deterministic mapping
         return (_mock_estimate(name, price, qty, category), "fallback", None)

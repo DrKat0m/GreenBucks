@@ -77,17 +77,15 @@ def compute_cashback(amount: Decimal | float, score: Optional[int]) -> Decimal:
 
 
 def quick_merchant_score(merchant_name: Optional[str], category: Optional[list[str]]) -> int:
-    """Heuristic score without OCR: categories trump merchant if present.
-    Neutral default = 5.
-    Greener signals: Public Transit, Rail, Bicycle, Organic, Local -> 8-10
-    Impact signals: Gas, Air, Fast Food, Ride Share -> 0-4
-    Otherwise neutral 5-6.
+    """Enhanced heuristic score using CO2-based logic for realistic eco-scoring.
+    
+    Uses the same CO2 per dollar factors as receipt items to ensure consistency
+    across all transactions, whether they have receipts or not.
     """
-    cats = {c.lower() for c in (category or [])}
-    if any(k in cats for k in ["public transit", "rail", "bicycle", "electric charging", "organic", "local"]):
-        return 9
-    if any(k in cats for k in ["gas", "air", "fast food", "ride share"]):
-        return 3
-    if any(k in cats for k in ["groceries", "coffee shop", "restaurant"]):
-        return 6
-    return 5
+    from .integrations.item_category_map import lookup_kg_co2e_per_usd
+    
+    # Use the same CO2 lookup logic as receipt items
+    co2e_per_usd = lookup_kg_co2e_per_usd(merchant_name or "", category)
+    
+    # Convert CO2 per USD to eco score using the same logic as receipt items
+    return score_from_co2e_per_dollar(co2e_per_usd)
