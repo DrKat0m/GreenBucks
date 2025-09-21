@@ -9,7 +9,13 @@ import bg from "../../assets/greenbkg.jpeg";
  */
 export default function EcoBackground() {
   const { pathname } = useLocation();
-  const onDashboard = pathname === "/";
+  const onDashboard = pathname === "/dashboard";
+  const onHome = pathname === "/";
+  
+  // Show background on dashboard, transactions, and about pages
+  const shouldShow = pathname === "/dashboard" || pathname === "/transactions" || pathname === "/about";
+  
+  if (!shouldShow) return null;
 
   return (
     <div

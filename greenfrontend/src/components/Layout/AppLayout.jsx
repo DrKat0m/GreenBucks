@@ -5,11 +5,12 @@ import useStore from "../../lib/store";
 import { Button } from "../UI/Button";
 import { cn } from "../../lib/cn";
 import logo from "../../assets/greenbucks_logo.svg";
-import FloatingKoshiButton from "../Koshi/FloatingKoshiButton";
+import KoshiHTMLButton from "../Koshi/KoshiHTMLButton";
 
 // 🔻 lazy-loaded decor & chat (keep initial bundle lean)
 const PageBackdrop = lazy(() => import("../Decor/PageBackdrop"));
-const KoshiChat = lazy(() => import("../Koshi/KoshiChat"));
+const EcoBackground = lazy(() => import("../Decor/EcoBackground"));
+const KoshiEmbeddedChat = lazy(() => import("../Koshi/KoshiEmbeddedChat"));
 
 // prefetch helpers (matching your route file paths)
 const prefetchDashboard = () => import("../../routes/Dashboard");
@@ -37,6 +38,11 @@ export default function AppLayout() {
           <PageBackdrop />
         </Suspense>
       )}
+
+      {/* ✅ Eco background for dashboard, transactions, and about pages */}
+      <Suspense fallback={null}>
+        <EcoBackground />
+      </Suspense>
 
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--bg-2)]/80 backdrop-blur">
         <div className="shell h-16 flex items-center justify-between">
@@ -97,15 +103,17 @@ export default function AppLayout() {
         <Outlet />
       </main>
 
-      <FloatingKoshiButton onOpen={() => setChatOpen(true)} />
+      <KoshiHTMLButton 
+        onToggle={() => setChatOpen(!chatOpen)} 
+        isOpen={chatOpen} 
+      />
 
       {/* 🔻 load chat only when opened */}
       {chatOpen && (
         <Suspense fallback={null}>
-          <KoshiChat
+          <KoshiEmbeddedChat
             open={chatOpen}
             onClose={() => setChatOpen(false)}
-            userName={user?.name?.split(" ")[0] ?? "there"}
           />
         </Suspense>
       )}
