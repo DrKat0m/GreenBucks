@@ -7,6 +7,8 @@
 - **Aarya Soni** 
 - **Kartavya Suhagiya** 
 - **Nikhil Saini**
+- **Modak Yadavalli**
+  
 
 A revolutionary fintech application that rewards sustainable spending through AI-powered eco-scoring, real bank integration, and personalized environmental insights.
 
